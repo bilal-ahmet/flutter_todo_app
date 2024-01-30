@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_todo_app/data/local_storage.dart';
+import 'package:flutter_todo_app/main.dart';
 import 'package:flutter_todo_app/model/task_model.dart';
 import 'package:intl/intl.dart';
 
@@ -14,10 +16,13 @@ class _TaskItemState extends State<TaskItem> {
   // var olan görev eğer henüz tamamlanmadıysa üzerinde dğişiklik yapabilmek için yeni bir listTile oluşturrarak orada kullanacağız.
   final TextEditingController _taskNameController = TextEditingController();
 
+  late LocalStorage _localStorage;
+
   @override
   void initState() {
     super.initState();
     _taskNameController.text = widget.task.isim;
+    _localStorage = locator<LocalStorage>();
   }
 
   @override
@@ -46,6 +51,7 @@ class _TaskItemState extends State<TaskItem> {
           ),
           onTap: () {
             widget.task.isCompleted = !widget.task.isCompleted;
+            _localStorage.updateTask(task: widget.task);
             setState(() {});
           },
         ),
@@ -69,6 +75,7 @@ class _TaskItemState extends State<TaskItem> {
                 decoration: const InputDecoration(border: InputBorder.none),
                 onSubmitted: (value) {
                   widget.task.isim = value;
+                  _localStorage.updateTask(task: widget.task);
                 },
               ),
         trailing: Text(

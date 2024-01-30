@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
+import 'package:flutter_todo_app/data/local_storage.dart';
+import 'package:flutter_todo_app/main.dart';
 import 'package:flutter_todo_app/model/task_model.dart';
 import 'package:flutter_todo_app/widgets/task_list_item.dart';
 
@@ -12,12 +14,17 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late List<Task> _allTasks;
+  late LocalStorage _localStorage;
 
   @override
   void initState() {
 
     super.initState();
     _allTasks = <Task>[];
+
+    // main klasöründe get_it paketini LOcalStorage üzerinden yaptıpımız için başka zaman storage yöntemi değiştiğinde sadece main'de
+    // bulunan kısmı değiştireceğiz.
+    _localStorage = locator<LocalStorage>();
   }
 
   @override
@@ -64,6 +71,7 @@ class _HomePageState extends State<HomePage> {
           ),
           onDismissed: (direction) {
             _allTasks.removeAt(index);
+            _localStorage.deleteTask(task: _oankiListeEleman);
             setState(() {
               
             });
@@ -96,9 +104,10 @@ class _HomePageState extends State<HomePage> {
               onSubmitted: (value) {
                 Navigator.pop(context);
               
-                DatePicker.showTimePicker(context, showSecondsColumn: false, onConfirm: (time) {
+                DatePicker.showTimePicker(context, showSecondsColumn: false, onConfirm: (time) async {
                   var yeniEklenecekGorev = Task.create(isim: value, createdAt: time);
-                  _allTasks.add(yeniEklenecekGorev);
+                  _allTasks.insert(0, yeniEklenecekGorev);
+                  await _localStorage.addTask(task: yeniEklenecekGorev);
                   setState(() {
                     
                   });
