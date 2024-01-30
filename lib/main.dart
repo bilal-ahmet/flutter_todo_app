@@ -5,16 +5,14 @@ import 'package:flutter_todo_app/pages/home_page.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/adapters.dart';
 
-
 final locator = GetIt.instance;
 
-void setup (){
-
+void setup() {
   // <LocalStorage>, denmesindeki sebep başka bir zaman depolama değiştiği zaman sadece (HiveLOcalStorage) kısmı değişecek
   locator.registerSingleton<LocalStorage>(HiveLocalStorage());
 }
 
-Future<void> setupHive() async{
+Future<void> setupHive() async {
   await Hive.initFlutter();
 
   // TaskAdapter(), build_runner ile oluşturulan task_model.g sınıfında bulunmaktadır.
@@ -23,19 +21,19 @@ Future<void> setupHive() async{
   var taskBox = await Hive.openBox<Task>("tasks");
 
   for (var task in taskBox.values) {
-    if(task.createdAt.day != DateTime.now().day){
+    if (task.createdAt.day != DateTime.now().day) {
       taskBox.delete(task.id);
     }
   }
 }
 
-void main() async{ 
+void main() async {
   // tunApp'ten önce çalışması istenilen dosylar olduğu için aşağıdaki kod yazılır.
   WidgetsFlutterBinding.ensureInitialized();
 
   await setupHive();
   setup();
-  
+
   runApp(const MyApp());
 }
 
@@ -45,17 +43,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primaryColor: Colors.blue,
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          iconTheme: IconThemeData(color: Colors.black)
-          ),
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          primaryColor: Colors.blue,
+          appBarTheme: const AppBarTheme(
+              backgroundColor: Colors.white,
+              elevation: 0,
+              iconTheme: IconThemeData(color: Colors.black)),
         ),
-      title: 'Material App',
-      home: const HomePage()
-    );
+        title: 'Material App',
+        home: const HomePage());
   }
 }

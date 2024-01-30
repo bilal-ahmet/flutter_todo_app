@@ -3,6 +3,7 @@ import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 import 'package:flutter_todo_app/data/local_storage.dart';
 import 'package:flutter_todo_app/main.dart';
 import 'package:flutter_todo_app/model/task_model.dart';
+import 'package:flutter_todo_app/widgets/custom_search_delegate.dart';
 import 'package:flutter_todo_app/widgets/task_list_item.dart';
 
 class HomePage extends StatefulWidget {
@@ -18,7 +19,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-
     super.initState();
     _allTasks = <Task>[];
 
@@ -30,56 +30,67 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: GestureDetector(
-            onTap: () {
-              _showAddTaskBootmSheet(context);
-            },
-            child: const Text(
-              "bügün neler yapacaksın",
-              style: TextStyle(color: Colors.black),
-            )),
-        centerTitle:
-            false, // ios'ta başlıklar ortadan başlar onu engellemek için kullanılıyor
-        actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.search)),
-          IconButton(
-              onPressed: () {
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          title: GestureDetector(
+              onTap: () {
                 _showAddTaskBootmSheet(context);
               },
-              icon: const Icon(Icons.add)),
-        ],
-      ),
+              child: const Text(
+                "bügün neler yapacaksın",
+                style: TextStyle(color: Colors.black),
+              )),
+          centerTitle:
+              false, // ios'ta başlıklar ortadan başlar onu engellemek için kullanılıyor
+          actions: [
+            IconButton(
+                onPressed: () {
+                  _showSearchPage();
+                },
+                icon: const Icon(Icons.search)),
+            IconButton(
+                onPressed: () {
+                  _showAddTaskBootmSheet(context);
+                },
+                icon: const Icon(Icons.add)),
+          ],
+        ),
+        body: _allTasks.isNotEmpty
+            ? ListView.builder(
+                itemCount: _allTasks.length,
+                itemBuilder: (context, index) {
+                  var _oankiListeEleman = _allTasks[index];
+                  getAllTaskFromDB();
 
-      body: _allTasks.isNotEmpty ? ListView.builder(itemCount: _allTasks.length, itemBuilder: (context, index) {
-        var _oankiListeEleman = _allTasks[index];
+                  // kaydırarak ListTile'dan çıkartma işlemi için kullanılıyor.
+                  return Dismissible(
 
-        // kaydırarak ListTile'dan çıkartma işlemi için kullanılıyor. 
-        return Dismissible(
-
-          // key değerinin uniq olması gerekiyor o yüzden Uuid ile oluşturduğumuz değeri buraya atabiliriz.
-          key: Key(_oankiListeEleman.id),
-
-          background: const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.delete, color: Colors.grey,),
-              SizedBox(width: 12,),
-              Text("bu görev silindi")
-            ],
-          ),
-          onDismissed: (direction) {
-            _allTasks.removeAt(index);
-            _localStorage.deleteTask(task: _oankiListeEleman);
-            setState(() {
-              
-            });
-          },
-          child: TaskItem(task: _oankiListeEleman)
-        );
-      },) : const Center(child: Text("haydi görev ekle"),)
-    );
+                      // key değerinin uniq olması gerekiyor o yüzden Uuid ile oluşturduğumuz değeri buraya atabiliriz.
+                      key: Key(_oankiListeEleman.id),
+                      background: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.delete,
+                            color: Colors.grey,
+                          ),
+                          SizedBox(
+                            width: 12,
+                          ),
+                          Text("bu görev silindi")
+                        ],
+                      ),
+                      onDismissed: (direction) {
+                        _allTasks.removeAt(index);
+                        _localStorage.deleteTask(task: _oankiListeEleman);
+                        setState(() {});
+                      },
+                      child: TaskItem(task: _oankiListeEleman));
+                },
+              )
+            : const Center(
+                child: Text("haydi görev ekle"),
+              ));
   }
 
   void _showAddTaskBootmSheet(BuildContext context) {
@@ -103,20 +114,37 @@ class _HomePageState extends State<HomePage> {
               // text field'a yazı yazıldıktan sonra okey işaretine basılması onSubmitted ile tutuluyor. bu işlemden sonra ekranı kapattık
               onSubmitted: (value) {
                 Navigator.pop(context);
-              
-                DatePicker.showTimePicker(context, showSecondsColumn: false, onConfirm: (time) async {
-                  var yeniEklenecekGorev = Task.create(isim: value, createdAt: time);
-                  _allTasks.insert(0, yeniEklenecekGorev);
-                  await _localStorage.addTask(task: yeniEklenecekGorev);
-                  setState(() {
-                    
-                  });
-                },);
-              },    
+
+                DatePicker.showTimePicker(
+                  context,
+                  showSecondsColumn: false,
+                  onConfirm: (time) async {
+                    var yeniEklenecekGorev =
+                        Task.create(isim: value, createdAt: time);
+                    _allTasks.insert(0, yeniEklenecekGorev);
+                    await _localStorage.addTask(task: yeniEklenecekGorev);
+                    setState(() {});
+                  },
+                );
+              },
             ),
           ),
         );
       },
     );
+  }
+
+  void getAllTaskFromDB()async {
+    _allTasks = await _localStorage.getAllTask();
+    setState(() {
+      
+    });
+  }
+
+  void _showSearchPage() {
+    showSearch(
+        context: context, delegate: CustomSearchDelegate(allTasks: _allTasks));
+
+        getAllTaskFromDB();
   }
 }

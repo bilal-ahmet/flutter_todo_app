@@ -21,12 +21,15 @@ class _TaskItemState extends State<TaskItem> {
   @override
   void initState() {
     super.initState();
-    _taskNameController.text = widget.task.isim;
+
+    // aramdan geri gelince 1 kere çalıştığı güncellenmedi o yüzden builde taşıdık
+    //_taskNameController.text = widget.task.isim;
     _localStorage = locator<LocalStorage>();
   }
 
   @override
   Widget build(BuildContext context) {
+    _taskNameController.text = widget.task.isim;
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       decoration: BoxDecoration(
@@ -49,9 +52,9 @@ class _TaskItemState extends State<TaskItem> {
               color: Colors.white,
             ),
           ),
-          onTap: () {
+          onTap: () async {
             widget.task.isCompleted = !widget.task.isCompleted;
-            _localStorage.updateTask(task: widget.task);
+            await _localStorage.updateTask(task: widget.task);
             setState(() {});
           },
         ),
@@ -63,23 +66,27 @@ class _TaskItemState extends State<TaskItem> {
                     decoration: TextDecoration.lineThrough, color: Colors.grey),
               )
             : TextField(
-              minLines: 1,
-              maxLines: 10,
+                minLines: 1,
+                maxLines: 10,
 
-              // max line eklediğimiz zaman klavyede submit tuşu yerine new line tuşu aktif oldu, bu kod ile submit tuşu getirildi
-              textInputAction: TextInputAction.done,
+                // max line eklediğimiz zaman klavyede submit tuşu yerine new line tuşu aktif oldu, bu kod ile submit tuşu getirildi
+                textInputAction: TextInputAction.done,
 
-              // artı tuşuna basıldığı zaman direkt klavye ile başlanmasını sağlıyor
-              //autofocus: true,    
+                // artı tuşuna basıldığı zaman direkt klavye ile başlanmasını sağlıyor
+                //autofocus: true,
                 controller: _taskNameController,
                 decoration: const InputDecoration(border: InputBorder.none),
                 onSubmitted: (value) {
                   widget.task.isim = value;
                   _localStorage.updateTask(task: widget.task);
+                  setState(() {});
                 },
               ),
         trailing: Text(
-          DateFormat("hh: mm a",).format(widget.task.createdAt), style: const TextStyle(fontSize: 15, color: Colors.grey),
+          DateFormat(
+            "hh: mm a",
+          ).format(widget.task.createdAt),
+          style: const TextStyle(fontSize: 15, color: Colors.grey),
         ),
       ),
     );
