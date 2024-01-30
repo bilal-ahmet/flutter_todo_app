@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 import 'package:flutter_todo_app/data/local_storage.dart';
@@ -21,6 +22,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _allTasks = <Task>[];
+    getAllTaskFromDB();
 
     // main klasöründe get_it paketini LOcalStorage üzerinden yaptıpımız için başka zaman storage yöntemi değiştiğinde sadece main'de
     // bulunan kısmı değiştireceğiz.
@@ -37,9 +39,9 @@ class _HomePageState extends State<HomePage> {
                 _showAddTaskBootmSheet(context);
               },
               child: const Text(
-                "bügün neler yapacaksın",
+                "title",
                 style: TextStyle(color: Colors.black),
-              )),
+              ).tr() ),
           centerTitle:
               false, // ios'ta başlıklar ortadan başlar onu engellemek için kullanılıyor
           actions: [
@@ -60,14 +62,14 @@ class _HomePageState extends State<HomePage> {
                 itemCount: _allTasks.length,
                 itemBuilder: (context, index) {
                   var _oankiListeEleman = _allTasks[index];
-                  getAllTaskFromDB();
+                  
 
                   // kaydırarak ListTile'dan çıkartma işlemi için kullanılıyor.
                   return Dismissible(
 
                       // key değerinin uniq olması gerekiyor o yüzden Uuid ile oluşturduğumuz değeri buraya atabiliriz.
                       key: Key(_oankiListeEleman.id),
-                      background: const Row(
+                      background: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(
@@ -77,7 +79,7 @@ class _HomePageState extends State<HomePage> {
                           SizedBox(
                             width: 12,
                           ),
-                          Text("bu görev silindi")
+                          Text("remove_task").tr()
                         ],
                       ),
                       onDismissed: (direction) {
@@ -88,8 +90,8 @@ class _HomePageState extends State<HomePage> {
                       child: TaskItem(task: _oankiListeEleman));
                 },
               )
-            : const Center(
-                child: Text("haydi görev ekle"),
+            : Center(
+                child: Text("empty_task_list").tr(),
               ));
   }
 
@@ -105,8 +107,8 @@ class _HomePageState extends State<HomePage> {
           padding: MediaQuery.of(context).viewInsets,
           child: ListTile(
             title: TextField(
-              decoration: const InputDecoration(
-                  hintText: "görev nedir ?",
+              decoration: InputDecoration(
+                  hintText: "add_task".tr(),
 
                   // ListTile ile gelen alt çizgiyi kaldırmak için kullanılıyor.
                   border: InputBorder.none),

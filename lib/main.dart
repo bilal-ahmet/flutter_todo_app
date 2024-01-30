@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_todo_app/data/local_storage.dart';
 import 'package:flutter_todo_app/model/task_model.dart';
@@ -30,11 +31,19 @@ Future<void> setupHive() async {
 void main() async {
   // tunApp'ten önce çalışması istenilen dosylar olduğu için aşağıdaki kod yazılır.
   WidgetsFlutterBinding.ensureInitialized();
-
+  
   await setupHive();
   setup();
-
-  runApp(const MyApp());
+  
+  runApp(
+    EasyLocalization(
+        supportedLocales: [Locale('en', 'US'), Locale('tr', 'TR')],
+        path:
+            'assets/translation', // <-- change the path of the translation files
+        fallbackLocale: Locale('en', 'US'),
+        child: MyApp()),
+  );
+  await EasyLocalization.ensureInitialized();
 }
 
 class MyApp extends StatelessWidget {
@@ -43,6 +52,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+        localizationsDelegates: context.localizationDelegates,
+        supportedLocales: context.supportedLocales,
+        locale: context.locale,
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primaryColor: Colors.blue,

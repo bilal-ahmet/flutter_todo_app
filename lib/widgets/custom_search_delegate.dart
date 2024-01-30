@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_todo_app/data/local_storage.dart';
 import 'package:flutter_todo_app/main.dart';
@@ -49,7 +50,7 @@ class CustomSearchDelegate extends SearchDelegate {
 
                       // key değerinin uniq olması gerekiyor o yüzden Uuid ile oluşturduğumuz değeri buraya atabiliriz.
                       key: Key(_oankiListeEleman.id),
-                      background: const Row(
+                      background: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(
@@ -59,7 +60,7 @@ class CustomSearchDelegate extends SearchDelegate {
                           SizedBox(
                             width: 12,
                           ),
-                          Text("bu görev silindi")
+                          Text("remove_task").tr()
                         ],
                       ),
                       onDismissed: (direction) async{
@@ -68,7 +69,7 @@ class CustomSearchDelegate extends SearchDelegate {
                       },
                       child: TaskItem(task: _oankiListeEleman));
                 },
-              ) : Center(child: Text("aradğınızı bulamadık"),);
+              ) : Center(child: Text("search_not_found").tr(),);
   }
 
   // arama çubuğuna bir şey yazılırken gösterilecek şeyler için kullanılır
